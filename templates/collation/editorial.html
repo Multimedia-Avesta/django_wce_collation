@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load static %}
+{% load collation_filters %}
+
+{% block head %}
+	{{ block.super }}
+	<script type="text/javascript" src="{% static 'common/js/jquery-3.6.0.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'collation/js/editorial.js' %}"></script>
+	<link rel=stylesheet href="{% static 'common/pure-release-1.0.0/pure-min.css' %}" type="text/css"/>
+	<link rel=stylesheet href="{% static 'CE_core/css/collation.css' %}" type="text/css"/>
+	<link rel=stylesheet href="{% static 'collation/css/editorial.css' %}" type="text/css"/>
+	<link rel=stylesheet href="{% static 'collation/css/special_classes.css' %}" type="text/css"/>
+	<title>{{ page_title }}</title>
+{% endblock %}
+
+
+{% block container %}
+	<main role="main" id="container">
+		{% if previous_url %}
+			<span><a href="{{ previous_url }}">Previous unit</a></span>
+		{% endif %}
+		<form id="select-editorial-text" method="post">
+			{% csrf_token %}
+	    {% for unit in units %}
+				{% if unit.structure == None %}
+					<p><span class="context-label">{{ unit.context }}</span>: No approved/edited unit available</p>
+				{% else %}
+		    	{% if unit.context == target %}
+			      <p><span class="context-label">{{ unit.context }}</span></p>
+						<input type="hidden" value="{{ unit.context }}" id="context" name="context"/>
+						<table class="collation_overview"><tbody><tr>
+						{% for app in unit.structure.apparatus %}
+							{% if unit.structure.overtext|has_ritual_direction_before:app %}
+								<td>
+									<table id="variantunit_{{ forloop.counter0 }}_ritual_before" class="variant_unit"><tbody>
+										<tr><td>Ritual directions</td></tr>
+										<tr>
+											<td>
+												<label for="nolinebreak">No linebreak before</label>
+												{% if unit.structure.overtext|has_no_linebreak_before_ritual_direction_before:app %}
+													<input checked="checked" type="checkbox" id="nolinebreak" name="no_linebreak_before_rdbefore_variantunit_{{ forloop.counter0 }}"/>
+												{% else %}
+													<input type="checkbox" id="nolinebreak" name="no_linebreak_before_rdbefore_variantunit_{{ forloop.counter0 }}"/>
+												{% endif %}
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<label class="visuallyhidden" for="rdbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+													Ritual direction transliteration
+												</label>
+												<textarea id="rdbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+																  name="rdbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+												>{{ unit.structure.overtext|get_rd_before:app }}</textarea>
+											</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td>
+												<label class="visuallyhidden" for="rdtbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+													Ritual direction transcription
+												</label>
+												<textarea id="rdtbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+																	name="rdtbefore_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+												>{{ unit.structure.overtext|get_rdt_before:app }}</textarea>
+
+											</td>
+										</tr>
+									</table
+								</td>
+							{% endif %}
+							<td>
+								<table id="variantunit_{{ forloop.counter0 }}" class="variant_unit"><tbody>
+									{% if app.linebreak_after == True %}
+										<input type="hidden" id="linebreak_after_{{ forloop.counter0 }}" name="linebreak_after_{{ forloop.counter0 }}" value="true"/>
+									{% else %}
+										<input type="hidden" id="linebreak_after_{{ forloop.counter0 }}" name="linebreak_after_{{ forloop.counter0 }}" value="false"/>
+									{% endif %}
+									<tr><td>
+										{# <span>{{ app.start }}-{{ app.end }}</span> #}
+										{% if app.linebreak_after == True %}
+											<span><button class="lb-button" id="lb_button_{{ forloop.counter0 }}" data-newlinemarkerid="new_line_marker_{{ forloop.counter0 }}">remove lb</button></span>
+										{% else %}
+											<span><button class="lb-button" id="lb_button_{{ forloop.counter0 }}" data-newlinemarkerid="new_line_marker_{{ forloop.counter0 }}">lb after</button></span>
+										{% endif %}
+									</td></tr>
+									<tr class="lang-select-row" style="display:none"><td>
+										<label class="visuallyhidden" for="language_select_{{ forloop.counter0 }}">
+											Language of unit
+										</label>
+										<span><select id="language_select_{{ forloop.counter0 }}" name="language_select_{{ forloop.counter0 }}">
+											{% for language in languages %}
+												{% if unit.structure.overtext|get_overtext_language:app is None and language.value == project_language %}
+													<option selected="selected" value="{{ language.value }}">{{ language.name }}</option>
+												{% else %}
+													{% if unit.structure.overtext|get_overtext_language:app == language.value %}
+														<option selected="selected" value="{{ language.value }}">{{ language.name }}</option>
+													{% else %}
+														<option value="{{ language.value }}">{{ language.name }}</option>
+													{% endif %}
+												{% endif %}
+											{% endfor %}
+										</select></span>
+									<td/><tr/>
+									{% if types_required == True %}
+										<tr class="type-select-row" style="display:none"><td>
+											<label class="visuallyhidden" for="type_select_{{ forloop.counter0 }}">
+												Type of unit
+											</label>
+											<span><select id="type_select_{{ forloop.counter0 }}" name="type_select_{{ forloop.counter0 }}"
+																		class="type-select"
+																		data-inputid="variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+												{% for type in types %}
+													{% if unit.structure.overtext|get_overtext_type:app == type %}
+														<option selected="selected" value="{{ type }}">{{ type|title }}</option>
+													{% else %}
+														<option value="{{ type }}">{{ type|title }}</option>
+													{% endif %}
+												{% endfor %}
+											</select></span>
+										<td/><tr/>
+									{% endif %}
+									<tr><td>
+										<label class="visuallyhidden" for="variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+											Editorial Text
+										</label>
+										<input id="variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+												   name="variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+													 type="text" class="{{ unit.structure.overtext|get_overtext_type:app }}"
+													 value="{{ unit.structure.overtext|get_overtext:app }}"/>
+									</td></tr>
+									{% for rdg in app.readings %}
+										{% if rdg.text|length > 0 %}
+											<tr><td data-inputid="variantunit_{{ forloop.parentloop.counter0 }}_words_{{ app.start }}-{{ app.end }}" class="reading-text">
+											{{ rdg.text_string|unescape }}
+											</td></tr>
+										{% endif %}
+									{% endfor %}
+								</tbody></table>
+							</td>
+							{% if app.linebreak_after == True %}
+								<td id="new_line_marker_{{ forloop.counter0 }}" class="lb-marker-active">\</td>
+							{% else %}
+								<td id="new_line_marker_{{ forloop.counter0 }}" class="lb-marker-hidden">\</td>
+							{% endif %}
+							{% if unit.structure.overtext|has_ritual_direction_after:app %}
+								<td>
+									<table id="variantunit_{{ forloop.counter0 }}_ritual_after" class="variant_unit"><tbody>
+										<tr><td>Ritual directions</td></tr>
+										<tr>
+											<td>
+												<label for="nolinebreak">No linebreak before</label>
+												{% if unit.structure.overtext|has_no_linebreak_before_ritual_direction_after:app %}
+													<input checked="checked" type="checkbox" id="nolinebreak" name="no_linebreak_before_rdafter_variantunit_{{ forloop.counter0 }}"/>
+												{% else %}
+													<input type="checkbox" id="nolinebreak" name="no_linebreak_before_rdafter_variantunit_{{ forloop.counter0 }}"/>
+												{% endif %}
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<label class="visuallyhidden" for="rdafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+													Ritual direction transliteration
+												</label>
+												<textarea id="rdafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+																	name="rdafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+												form="select-editorial-text">{{ unit.structure.overtext|get_rd_after:app }}</textarea>
+											</td>
+										</tr>
+										<tr><td>&nbsp;</td></tr>
+										<tr>
+											<td>
+												<label class="visuallyhidden" for="rdtafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}">
+													Ritual direction transcription
+												</label>
+												<textarea id="rdtafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+																	name="rdtafter_variantunit_{{ forloop.counter0 }}_words_{{ app.start }}-{{ app.end }}"
+												form="select-editorial-text">{{ unit.structure.overtext|get_rdt_after:app }}</textarea>
+
+											</td>
+										</tr>
+									</table
+								</td>
+							{% endif %}
+						{% endfor %}
+						</tr></tbody></table>
+					{% else %}
+						 <p><span class="context-label">{{ unit.context }}:</span> <span class="overtext">{{ unit.structure.overtext|get_overtext }}</span></p>
+					{% endif %}
+				{% endif %}
+	    {% endfor %}
+			{% if save %}
+				<input type="submit" value="Save"/>
+			{% endif %}
+		</form>
+		<br/>
+		{% if next_url %}
+			<span><a href="{{ next_url }}">Next unit</a></span>
+		{% endif %}
+  </main>
+{% endblock %}
+
+
+{% block footer %}
+	<div id="footer">
+		<a class="pure-button left_foot" href="/collation/projectsummary">Back to Project Summary</a>
+		<button class="pure-button right_foot" id="show-lang-select-button">Show/Hide Language Options</button>
+		{% if types_required == True %}
+			<button class="pure-button right_foot" id="show-subtype-select-button">Show/Hide Classification Options</button>
+		{% endif %}
+
+	</div>
+{% endblock %}

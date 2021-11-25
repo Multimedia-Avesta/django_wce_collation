@@ -1,0 +1,94 @@
+{% extends "collation/base.html" %}
+{% load static %}
+{% load collation_filters %}
+
+{% block head %}
+	{{ block.super }}
+	<script type="text/javascript" src="{% static 'common/js/forms.js' %}"></script>
+	<script type="text/javascript" src="{% static 'CE_core/js/draggable.js' %}"></script>
+  	<script type="text/javascript" src="{% static 'collation/js/ceremony_mapping.js' %}"></script>
+  	<script type="text/javascript" src="{% static 'collation/js-sort-list/sort-list.js' %}"></script>
+	<link rel=stylesheet href="{% static 'collation/css/ceremony_mapping.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block container %}
+  <main role="main" id="container">
+  	<div id="search_widget">
+  		<form id="filter_form" action="/collation/projectsummary/ceremonymapping" method="get">
+  			<label for="search_field" class="visuallyhidden">Select field to search</label>
+  			<select id="search_field">
+  				<option value="none">select</option>
+  				{% if search_field == 'context' %}
+  				<option value="context" selected="selected">Context</option>
+  				{% else %}
+  				<option value="context">Context</option>
+  				{% endif %}
+  				{% block search_options %}
+  				{% for ceremony in ceremony_list %}
+  				{% if search_field == ceremony %}
+  				<option value="{{ ceremony }}" selected="selected">{{ ceremony }}</option>
+  				{% else %}
+  				<option value="{{ ceremony }}">{{ ceremony }}</option>
+  				{% endif %}
+  				{% endfor %}
+  				{% endblock %}
+  			</select>
+  			<label for="search_text" class="visuallyhidden">Search text</label>
+  			<input id="search_text" value="{{ search_text }}" type="text" />
+  			<input class="pure-button" id="search" type="submit" value="Go" />
+  		</form>
+  		{% if remove_filter_required %}
+  		<button id="remove_filter_button" data-url="{{ no_filter_link }}" class="buttonlink pure-button" type="button">{{ remove_filter_button_label }}</button>
+  		{% endif %}
+  	</div>
+
+  	<div id="add_container">
+
+  	</div>
+  	<form id="ceremony-mapping-form" action="/collation/projectsummary/ceremonymapping/edit" method="post">
+  		<input type="hidden" id="project_id" value="{{ project.id }}" />
+  		<input type="hidden" id="ceremony_list" value="{{ ceremony_list_string }}" />
+  		{% csrf_token %}
+  		<table class="data_list" id="data_table">
+  			<tbody>
+  				<tr>
+  					<th><span class="visuallyhidden">Select entry for editing</span></th>
+  					<th>Context</th>
+  					{% for ceremony in ceremony_list %}
+  					<th>{{ ceremony }}</th>
+  					{% endfor %}
+
+  					{% for context, mappings in data.items %}
+  				<tr class="{{ forloop.counter0|get_row_class }}">
+  					<td class="select_cell">
+  						<label for="edit_{{ context }}" class="visuallyhidden">
+  							Edit the entry for the unit {{ context }}
+  						</label>
+  						<input id="edit_{{ context }}" name="context" value="{{ context }}" type="radio" />
+  						<input type="hidden" id="{{ context }}" value="{{ mappings.details }}" />
+  					</td>
+  					<td>{{ context }}</td>
+  					{% for ceremony in ceremony_list %}
+  					<td>{{ mappings|get_ceremony_mapping:ceremony }}</td>
+  					{% endfor %}
+  				</tr>
+  				{% endfor %}
+  			</tbody>
+  		</table>
+  	</form>
+
+  </main>
+
+{% endblock %}
+
+{% block footer %}
+	<div id="footer">
+		<a class="pure-button left_foot" href="/collation/projectsummary">Project Page</a>
+
+
+		<button id="add_mapping_button" class="pure-button right_foot" type="button">Add New</button>
+		<button id="edit_mapping_button" class="pure-button right_foot" type="button">Edit Selected</button>
+		<button id="delete_mapping_button" class="pure-button right_foot" type="button">Delete Selected</button>
+		<button id="edit_ceremonies_button" class="pure-button right_foot" type="button">Edit Ceremony List</button>
+	</div>
+{% endblock %}

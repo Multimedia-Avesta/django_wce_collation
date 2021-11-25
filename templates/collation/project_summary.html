@@ -1,0 +1,198 @@
+{% extends "collation/base.html" %}
+{% load static %}
+
+{% block head %}
+	{{ block.super }}
+	<link rel=stylesheet href="{% static 'collation/css/project_summary.css' %}" type="text/css"/>
+	<script type="text/javascript" src="{% static 'collation/js/task_progress.js' %}"></script>
+	<script type="text/javascript" src="{% static 'common/js/forms.js' %}"></script>
+  <script type="text/javascript" src="{% static 'api/js/api.js' %}"></script>
+	<script type="text/javascript" src="{% static 'collation/js/project_summary.js' %}"></script>
+
+{% endblock %}
+
+{% block container %}
+  <main role="main" id="container">
+    <input type="hidden" value="{{ project.id }}" id="project_id"/>
+		<div class="column-left">
+    	<div class="section" id="progress_summary_container">
+			<div id="summary_overlay" class="div_loading">
+				<div id="spinner">
+					<span class="flower-12l-48x48"/>
+				</div>
+			</div>
+			<div id="progress_summary" class="column-left-top">
+				<h2 id="summary-section-title">Progress Summary</h2>
+				<label for="summary_selection" class="visuallyhidden">Select chapter to show in summary data</label>
+				<span id="summary_title">Showing summary data for
+					<select id="summary_selection">
+						<option value="all">all chapters</option>
+						{% for chapter in chapters %}
+							 <option value="{{ chapter }}">chapter {{ chapter }}</option>
+						{% endfor %}
+					</select>
+				</span>
+				<div class="summary_section" id="regularised">
+						<h3 class="summary_heading">regularised</h3>
+						<div style="width:100px;border:1px solid black"><div id="regularised_bar" style="background-color:blue;height:20px;width:0px"></div></div>
+						<span><span id="regularised_progress">0</span> of <span id="regularised_total">0</span> (<span id="regularised_percentage">0</span>%)</span>
+				</div>
+			 	<div class="summary_section" id="set">
+						<h3 class="summary_heading">set</h3>
+						<div style="width:100px;border:1px solid black"><div id="set_bar" style="background-color:blue;height:20px;width:0px"></div></div>
+						<span><span id="set_progress">0</span> of <span id="set_total">0</span> (<span id="set_percentage">0</span>%)</span>
+				</div>
+				<div class="summary_section" id="ordered">
+						<h3 class="summary_heading">ordered</h3>
+						<div style="width:100px;border:1px solid black"><div id="ordered_bar" style="background-color:blue;height:20px;width:0px"></div></div>
+						<span><span id="ordered_progress">0</span> of <span id="ordered_total">0</span> (<span id="ordered_percentage">0</span>%)</span>
+				</div>
+				<div class="summary_section" id="approved">
+						<h3 class="summary_heading">approved</h3>
+						<div style="width:100px;border:1px solid black"><div id="approved_bar" style="background-color:blue;height:20px;width:0px"></div></div>
+						<span><span id="approved_progress">0</span> of <span id="approved_total">0</span> (<span id="approved_percentage">0</span>%)</span>
+				</div>
+				<div class="summary_section" id="edited">
+						<h3 class="summary_heading">text selected</h3>
+						<div style="width:100px;border:1px solid black"><div id="edited_bar" style="background-color:blue;height:20px;width:0px"></div></div>
+						<span><span id="edited_progress">0</span> of <span id="edited_total">0</span> (<span id="edited_percentage">0</span>%)</span>
+				</div>
+				<br class="clear"/>
+				<div id="detail-section">
+					<button class="pure-button" id="get-details-button">Details</button>
+					<div id="detail-display" style="display:none">
+					</div>
+				</div>
+			</div>
+
+			</div>
+			{% if managing_editor == True %}
+				<div id="select_editorial" class="section">
+					<form class="column-left-middle" id="select_editorial_form" action="/collation/edit" method="get">
+						<h2 id="select-editorial-section-title">Select Editorial Text</h2>
+						<label for="starting-context">Start from unit: </label>
+						<select name="unit" id="starting-context">
+							<option value="none">select</option>
+							{% for unit in basetext_units %}
+								 <option value="{{ unit.context }}">{{ unit.context }}</option>
+							{% endfor %}
+						</select>
+						<input class="pure-button" type="Submit" value="Start"/>
+					</form>
+				</div>
+				{% if has_supplements == True %}
+	 			 <div id="set-supplement-range" class="section">
+	 				 <h2 id="set-supplement-range-title">Supplement Ranges</h2>
+	 				 <a class="pure-button" href="/collation/projectsummary/supplements">Set/Edit Supplement Ranges</a>
+	 			 </div>
+				{% else %}
+					{% if delete_supplements == True %}
+						<div id="set-supplement-range" class="section">
+							 <h2 id="set-supplement-range-title">Supplement Ranges</h2>
+							 <a class="pure-button" href="/collation/projectsummary/supplements">Delete Supplement Ranges</a>
+						 </div>
+					{% endif %}
+	 		 	{% endif %}
+			 <div id="set-ceremony-mapping" class="section">
+				 <h2 id="set-ceremony-mapping-title">Ceremony Mapping</h2>
+				 <a class="pure-button" href="/collation/projectsummary/ceremonymapping">Set/Edit Ceremony Mapping</a>
+			 </div>
+		 {% endif %}
+
+		</div>
+		<div class="column-right" id="get_output">
+			<form class="column-right-top" id="apparatus-output-form" action="/collation/apparatus" method="post">
+				<h2 id="output-section-title">Apparatus Output</h2>
+				<div id="export-units">
+					 {% csrf_token %}
+					 <input type="hidden" value="{{ project.id }}" name="project__id" id="project__id"/>
+					 <input type="hidden" value="{{ project.name }}" name="project_name" id="project_name"/>
+					 <label for="status_select" class="visuallyhidden">Unit status to export</label>
+					 <span>Export
+						 <select id="status_select" name="status">
+						 	<option value="edited">text selected</option>
+							<option value="approved">approved</option>
+						</select>
+					</span>
+					<label for="chapter_export_select" class="visuallyhidden">Chapter to export</label>
+					<span>units in:
+					 <select class="string" name="chapter" id="chapter_export_select">
+						 <option value="all">all chapters</option>
+						 {% for chapter in chapters %}
+						 		<option value="{{ chapter }}">chapter {{ chapter }}</option>
+						 {% endfor %}
+					 </select>
+					</span>
+				</div>
+				<div id="export-units-exclude">
+					<fieldset id="excluded" class="data_group stringlist">
+						<legend>Except these units: </legend>
+						<ul id="excluded_list">
+						</ul>
+					</fieldset>
+					<label for="excluded_units_select" class="visuallyhidden">Select unit to exclude for export</label>
+					<select id="excluded_units_select">
+						<option value="none">select</option>
+						{% for unit in units %}
+	 						<option value="{{ unit }}">{{ unit }}</option>
+	 					{% endfor %}
+					</select>
+					<input class="pure-button" type="button" id="add_excluded" value="Add"/>
+				</div>
+				<div id="include-apparatus">
+					<label for="apparatus_select">Include apparatus: </label>
+					<select name="apparatus" id="apparatus_select">
+						<option value="include" selected="selected">Yes</option>
+						<option value="exclude">No</option>
+					</select>
+				</div>
+				<div id="exclude-apparatus-units">
+				 <fieldset id="omit_apparatus" class="data_group stringlist">
+					<legend>Except in these units:</legend>
+				 	<ul id="omit_apparatus_list">
+				 	</ul>
+				</fieldset>
+				<label for="exclude_apparatus_select" class="visuallyhidden">Select unit which does not require apparatus</label>
+				 <select id="exclude_apparatus_select">
+					 <option value="none">select</option>
+					 {% for unit in units %}
+						 <option value="{{ unit }}">{{ unit }}</option>
+					{% endfor %}
+				 </select>
+				 <input class="pure-button" type="button" id="add_omit_apparatus" value="Add"/>
+				</div>
+				<span id="ritual-directions-label">Include ritual directions in: </span>
+				<div id="ritual-directions">
+					<fieldset>
+						<legend class="visuallyhidden">Select output format required for ritual directions</legend>
+						<label><input type="radio" name="ritual_directions" value="transcription"/> transcription</label><br/>
+						<label><input type="radio" name="ritual_directions" checked="checked" value="transliteration"/> transliteration</label><br/>
+						<label><input type="radio" name="ritual_directions" value="none"/> omit ritual directions</label><br/>
+					</fieldset>
+				</div>
+				<div id="raised_plus">
+					<input type="checkbox" name="add_raised_plus" value="True"/>
+					<label for="add_raised_plus"> Add raised plus for unsupported readings (except editorial text)</label>
+				</div>
+				<div id="format">
+					<label for="format_select">Export format: </label>
+					<select name="format" id="format_select">
+				 		<option value="latex">LaTeX</option>
+				 		<option value="positive_xml">XML</option>
+				 		<option value="cbgm_xml">CBGM</option>
+					</select>
+				</div>
+				<div id="button-section">
+					<input id="get-apparatus-button" type="button" class="pure-button" value ="Get Apparatus"/>
+				</div>
+			</form>
+		</div>
+  </main>
+{% endblock %}
+
+{% block footer %}
+	<div id="footer">
+		<a class="pure-button left_foot" href="/collation">Collation Page</a>
+		<a class="pure-button left_foot" href="/collation/transcriptionmanagement">Transcription Management</a>
+	</div>
+{% endblock %}

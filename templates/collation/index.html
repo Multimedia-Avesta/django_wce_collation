@@ -1,0 +1,20 @@
+{% extends "collation/base.html" %}
+{% load static %}
+
+
+{% block container %}
+  <main role="main" id="container">
+    <p>You need to be logged in and have editing access to a project in order to access the collation editor. </p>
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <div id="footer">
+    {# TODO: this might not be needed here #}
+  	{% if switch_button == True %}
+  		<a class="pure-button left_foot" id="switch_project_button" href="{{ switch_url }}">
+  			Switch Project
+  		</a>
+  	{% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+#header {
+    background: lightsteelblue;
+}
+
+form {
+
+}
+
+.section {
+  border-bottom: 1px solid gray;
+  padding-bottom: 20px;
+}
+
+.section-lists {
+    display: grid;
+    grid-template-columns: 150px 150px 150px;
+    grid-column-gap: 20px;
+    padding-bottom: 20px;
+}
+
+p.siglum {
+  font-weight: bold;
+  grid-area: 1/ 4 / 1 / 1;
+}
+
+ul {
+  list-style-type: none;
+  background-color: silver;
+  padding: 10px;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 5px;
+  margin: 0
+}
+
+.delete_img {
+  vertical-align: bottom;
+  height: 18px;
+}
+
+.add-button {
+  align-self: center;
+}
+
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}

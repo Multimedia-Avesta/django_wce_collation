@@ -1,0 +1,63 @@
+{% extends "collation/base.html" %}
+{% load static %}
+
+{% block head %}
+	{{ block.super }}
+
+	<script>
+    var SITE_DOMAIN = "http://localhost:8000";
+		var staticUrl = SITE_DOMAIN + "{% static '' %}";
+  </script>
+  <script type="text/javascript" src="{% static 'CE_core/js/collation_editor.js' %}"></script>
+  <script type="text/javascript">
+    var servicesFile = 'collation/js/django_services.js';
+		collation_editor.init();
+  </script>
+	<link rel=stylesheet href="{% static 'collation/css/special_classes.css' %}" type="text/css"/>
+
+{% endblock %}
+
+{% block container %}
+
+  <main role="main" id="container">
+	 {% if missing_basetext == True %}
+	 	<div id="verse_selection">
+			<p>You cannot collate until a basetext has been selected. You should do this on the <a href="/collation/transcriptionmanagement">transcription management page</a>.</p>
+		</div>
+	 {% else %}
+	    <div id="verse_selection">
+		    <form id="collation_form">
+		        <label>Select verse: </label>
+		        <input type="hidden" id="project" name="project" value="{{ project.id }}"  />
+		        <input type="hidden" id="language" name="language" value="{{ project.language }}" />
+		        <input type="hidden" id="base_text" name="base_text" value="{{ project.basetext.identifier }}" />
+		        <input type="hidden" id="book" name="book" value="{{ project.work.abbreviation }}"/>
+		        <span id="book_name">{{ project.work.name }}</span>
+		        <input type="text" size="3" id="chapter" /> .
+		        <input type="text" size="3" id="stanza" /> .
+						<input type="text" size="2" id="line" />
+		        <input type="hidden" id="preselected_witnesses" name="preselected_witnesses" value="{{ preselected_witnesses }}"/>
+		        <input class="pure-button" type="button" id="collate" value="Collate Project Witnesses" />
+		        <input class="pure-button" type="button" id="load_saved" value="Load Saved Collation" />
+		        <div id="witnesses"></div>
+		    </form>
+		    <div id="saved_collations_div"></div>
+		</div>
+	{% endif %}
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <div id="footer">
+    {# TODO: this might not be needed here #}
+  	{% if switch_button == True %}
+  		<a class="pure-button left_foot" id="switch_project_button" href="{{ switch_url }}">
+  			Switch Project
+  		</a>
+  	{% endif %}
+		<a class="pure-button left_foot" id="project_summary_button" href="/collation/projectsummary">
+			Project Page
+		</a>
+		<input class="pure-button right_foot" id="collation_settings" type="button" value="Change Collation Settings"/>
+  </div>
+{% endblock %}

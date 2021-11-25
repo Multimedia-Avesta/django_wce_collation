@@ -1,0 +1,251 @@
+#header {
+    background: lightsteelblue;
+}
+
+h2 {
+    font-size: 13pt;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, td {
+    border: 1px solid black;
+}
+
+table td {
+    padding: 2px;
+}
+
+/* Summary page */
+
+div.section {
+  border-bottom: 1px solid silver;
+  padding-bottom: 25px;
+  padding-left: 5px;
+}
+
+div#summary {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid black;
+
+}
+
+div#project_select_div {
+    margin-bottom: 10px;
+    border-bottom: 1px solid black;
+    padding-left: 10px;
+    padding-bottom: 10px;
+}
+
+.div_loading {
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.flower-12l-48x48 {
+    animation: flower-12l-48x48 1s steps(12) infinite;
+    display: block;
+    width: 48px;
+    height: 48px;
+    background-image:url(../images/loading.png);
+}
+@keyframes flower-12l-48x48 { from { background-position: 0px 0px; } to { background-position: 0px -576px; } }
+
+div#spinner {
+  position: absolute;
+  display: none;
+  top: 50%;
+  left: 50%;
+}
+
+#summary_overlay {
+    position: absolute;
+    left: 5px;
+}
+
+label#select_chapter {
+    padding-left: 50px;
+}
+
+h3.summary_heading {
+    font-family: arial;
+    font-size: 12pt;
+}
+
+#container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 200px auto;
+    grid-column-gap: 30px;
+}
+
+.column-left-top {
+   grid-area: 1 / 1 / 2 / 2;
+   display: grid;
+   grid-template-columns: auto auto auto auto auto;
+   grid-template-rows: auto auto auto auto;
+}
+
+.column-right-top {
+   padding: 15px;
+   grid-area: 2 / 1 / 3 / 2;
+   display: grid;
+   grid-template-columns: 350px auto;
+   grid-template-rows: auto auto auto auto auto auto;
+   grid-row-gap: 40px;
+}
+
+.column-right {
+   grid-area: 1 / 2 / 3 / 3;
+ }
+
+ h2#summary-section-title {
+   grid-area: 1 / 1 / 2 / 6;
+ }
+
+  div#detail-section {
+    padding-top: 20px;
+    grid-area: 4 / 1 / 5 / 6;
+  }
+
+  div#detail-display {
+    padding-top: 20px;
+    padding-bottom: 50px;
+  }
+
+  div#detail-display table {
+    width: 90%;
+  }
+
+  div#detail-display th, div#detail-display td {
+    padding: 3px;
+  }
+
+  div#detail-display table, div#detail-display th, div#detail-display td {
+    border: 1px solid black;
+  }
+
+ #summary_title {
+   grid-area: 2 / 1 / 3 / 6;
+ }
+
+ h3#output-section-title {
+   grid-area: 1 / 1 / 2 / 3;
+ }
+
+fieldset {
+  border: none;
+}
+
+ div#export-units {
+   grid-row: 2;
+   grid-column: 1;
+ }
+
+ div#export-units-exclude {
+   grid-row: 2;
+   grid-column: 2;
+ }
+
+ div#include-apparatus {
+   grid-row: 3;
+   grid-column: 1;
+ }
+
+ div#exclude-apparatus-units {
+   grid-row: 3;
+   grid-column: 2;
+ }
+
+ #ritual-directions-label {
+   grid-row: 4;
+   grid-column: 1;
+ }
+
+ div#ritual-directions {
+   grid-row: 4;
+   grid-column: 2;
+ }
+
+ div#raised_plus {
+   grid-row: 5;
+   grid-column: 1 / 3;
+ }
+
+ div#format {
+   grid-row: 6;
+   grid-column: 1 / 3;
+ }
+
+ div#button-section {
+   grid-row: 7;
+   grid-column: 1 / 3;
+ }
+
+.disabled label, .disabled select, .disabled input, .disabled ul {
+  color: grey;
+}
+
+br.clear {
+  clear: both;
+}
+
+/* message box */
+
+.error_message {
+    position:fixed;
+    top:0;
+    left:0;
+    width:700px;
+    padding: 5px;
+    background-color: #D8D8D8;
+    border: 2px solid red;
+    z-index: 20;
+}
+
+.message {
+    position:fixed;
+    top:0;
+    left:0;
+    width:700px;
+    padding: 5px;
+    background-color: #D8D8D8;
+    border: 2px solid green;
+    z-index: 20;
+}
+
+.error_message #error_title {
+    color: red;
+}
+
+p#indicator {
+    display: inline-block;
+    width: 695px;
+}
+
+#error_close {
+    float: right;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.delete_exclude_unit, .delete_omit_apparatus {
+  vertical-align: middle;
+  height: 20px;
+  margin-left: 10px;
+}

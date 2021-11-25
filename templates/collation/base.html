@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% load collation_filters %}
+
+{% block head %}
+	{{ block.super }}
+	<script type="text/javascript" src="{% static 'common/js/jquery-3.6.0.min.js' %}"></script>
+	<link rel=stylesheet href="{% static 'common/pure-release-1.0.0/pure-min.css' %}" type="text/css"/>
+	<title>{{ page_title }}</title>
+{% endblock %}

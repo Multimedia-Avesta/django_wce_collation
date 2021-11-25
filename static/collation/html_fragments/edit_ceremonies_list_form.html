@@ -1,0 +1,23 @@
+<div id="ec_form_header" class="drag-zone">
+    <h1 id="form_title">Ceremonies</h1>
+</div>
+<form id="ec_form" action="" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" id="csrf_token" value=""/>
+   <div class="form_section" id="ceremonies_div">
+    <ul id="ceremonies">
+
+    </ul>
+    <div id="add_section">
+        <label for="new_ceremony">New Ceremony Identifier:</label>
+        <input type="text" id="new_ceremony"/>
+        <input class="btn" type="button" id="add_ceremony_button" value="Add"/>
+    </div>
+    <div id="delete_section">
+        <input id="delete_ceremonies_button" class="btn" type="button" value="Delete Selected Ceremonies"/>
+    </div>
+   </div>
+   <div id="submit_section" class="submit_section">
+      <input type="button" id="cancel_button" value="Cancel"/>
+      <input type="button" id="save_ceremonies_button" value="Save"/>
+   </div>
+</form>

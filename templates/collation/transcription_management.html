@@ -1,0 +1,108 @@
+{% extends "collation/base.html" %}
+{% load static %}
+
+{% block head %}
+	{{ block.super }}
+	<link rel=stylesheet href="{% static 'collation/css/transcription_management.css' %}" type="text/css"/>
+	<script type="text/javascript" src="{% static 'collation/js/sortable-1.14.0.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'collation/js/task_progress.js' %}"></script>
+	<script type="text/javascript" src="{% static 'common/js/forms.js' %}"></script>
+  <script type="text/javascript" src="{% static 'api/js/api.js' %}"></script>
+	<script type="text/javascript" src="{% static 'collation/js/transcription_management.js' %}"></script>
+
+{% endblock %}
+
+{% block container %}
+  <main role="main" id="container">
+    <input type="hidden" value="{{ project.id }}" id="project_id"/>
+
+		<div class="column-left">
+			<div id="transcription_exports" class="section">
+				<h2 id="transcription-output-section-title">Transcription Export Options</h2>
+				<label for="download-transcription">Download transcription:</label>
+				<select name="transcription" id="download-transcription">
+
+				</select>
+				<button id="download-transcription-button" class="pure-button">Download</button>
+				<br/>
+				<br/>
+				<form id="note-extraction-form">
+					{% csrf_token %}
+					<input type="hidden" name="project_id" value="{{ project.id }}"/>
+					<label for="extract-notes-from-transcription">Extract notes from:</label>
+					<select name="transcription-for-note-extraction" id="extract-notes-from-transcription">
+					</select>
+					<input type="button" class="pure-button" id="extract-notes-button" value="Extract"/>
+				</form>
+				<br/>
+				<form id="ritual-direction-extraction-form">
+					{% csrf_token %}
+					<input type="hidden" name="project_id" value="{{ project.id }}"/>
+					<label for="extract-rd-from-transcription">Extract Ritual Directions from:</label>
+					<select name="transcription-for-rd-extraction" id="extract-rd-from-transcription">
+					</select>
+					<input type="button" class="pure-button" id="extract-rd-button" value="Extract"/>
+				</form>
+			</div>
+			{% if managing_editor == True %}
+				<div id="transcription_to_latex" class="section">
+					<h2>LaTeX Generation</h2>
+					<form id="get-latex-form">
+						{% csrf_token %}
+						<input type="hidden" id="latex_src" name="latex_src" class="string"/>
+						<label for="make_latex">Select a transcription:<br/><br/>
+			            <input id="make_latex" type="file"></label>
+			            <input class="pure-button" type="button" id="get_latex_button" value="Generate Latex" disabled="disabled"/>
+					</form>
+				</div>
+				<div id="transcription_management" class="section">
+					<h2>Transcription Add/Delete</h2>
+					<br/>
+					<a class="pure-button" href="/transcriptions/manage">Add/Delete Transcriptions</a>
+				</div>
+			{% endif %}
+		</div>
+		<div class="column-right">
+
+		{% if managing_editor == True %}
+	    	<div id="project_witness_selection">
+				<div class="section" id="witness_lists_container">
+					<form action="">
+
+						<h2>Project Transcription Selection</h2>
+						<button class="pure-button" id="save_witness_selection">Save Transcription Selection</button>
+						<br/>
+						<p id="basetext-description"></p>
+						<label for="base-text-identifier">Base text: </label>
+						<select id="base-text-identifier">
+							<option value="none">select</option>
+						</select>
+						<br/>
+						<div class="witness_list left_list">
+							<p>Transcriptions in project</p>
+							<ul id="project_witnesses" class="draggable_list">
+
+							</ul>
+						</div>
+						<div class="witness_list right_list">
+							<p>Additional transcriptions available</p>
+							<ul id="additional_witnesses" class="draggable_list">
+
+							</ul>
+						</div>
+					</form>
+					<br class="clear"/>
+				</div>
+			{% endif %}
+			</div>
+		</div>
+
+  </main>
+{% endblock %}
+
+{% block footer %}
+	<div id="footer">
+		<a class="pure-button left_foot" href="/collation">Collation Page</a>
+		<a class="pure-button left_foot" href="/collation/projectsummary">Project Page</a>
+	</div>
+{% endblock %}

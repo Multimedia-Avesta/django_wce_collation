@@ -1,0 +1,30 @@
+#header {
+    background: lightsteelblue;
+}
+
+span.context-label {
+  font-weight: bold;
+}
+
+.lb-button {
+  float: right;
+}
+
+.lb-marker-hidden {
+  display: none;
+}
+
+.lb-marker-active {
+  display: block;
+}
+
+.visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}

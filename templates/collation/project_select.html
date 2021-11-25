@@ -1,0 +1,20 @@
+{% extends "collation/base.html" %}
+
+{% block container %}
+	<main role="main" id="container">
+		<form action="/collation/projectselect" method="post">
+			{% csrf_token %}
+			<label for="">Project select: </label>
+			<select name="project" id="project">
+				{% for project in projects %}
+					{% if current_project == project.id %}
+						<option selected="selected" value="{{ project.id }}">{{ project.name }}</option>
+					{% else %}
+						<option value="{{ project.id }}">{{ project.name }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+			<input id="project_select_submit" type="submit" value="Select project" />
+		</form>
+	</main>
+{% endblock %}

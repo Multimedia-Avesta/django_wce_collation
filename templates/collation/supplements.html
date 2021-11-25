@@ -1,0 +1,64 @@
+{% extends "collation/base.html" %}
+{% load static %}
+{% load collation_filters %}
+
+{% block head %}
+	{{ block.super }}
+  <script type="text/javascript" src="{% static 'common/js/jquery-3.6.0.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'collation/js/supplements.js' %}"></script>
+	<link rel=stylesheet href="{% static 'collation/css/supplements.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block container %}
+	<main role="main" id="container">
+		<p>For each supplement all units in which the supplement is to be reported instead of the main manuscript should
+			be added to the box on the right.
+		</p>
+		<p>If a unit is in both the supplement and the main manuscript that unit should not be included in the list on
+			the right.
+		</p>
+		<p>If a transcription is no longer in the list of project transcriptions there will be a warning and a button
+			to delete the data will be shown below the lists of units.</p>
+    <form id="supplement-range-form" method="POST">
+      {% csrf_token %}
+      {% for siglum, units in supplement_range.items %}
+        <div class="section" id="section_{{ siglum }}">
+			<div class="section-lists">
+	          <p class="siglum">{{ siglum }}</p>
+	          <input type="hidden" id="siglum_{{ forloop.counter0 }}" name="siglum_{{ forloop.counter0 }}" value="{{ siglum }}"/>
+			  <label for="units_{{ forloop.counter0 }}" class="visuallyhidden">Units in this transcription</label>
+	          <select id="units_{{ forloop.counter0 }}" multiple="multiple" size="10">
+	            {% for unit in basetext_units %}
+	              {% if unit in units %}
+	                <option value="{{ unit }}" disabled="disabled">{{ unit }}</option>
+	              {% else %}
+	                <option value="{{ unit }}">{{ unit }}</option>
+	              {% endif %}
+	           {% endfor %}
+	          </select>
+	          <input class="btn add-button" type="button" id="add_siglum_{{ forloop.counter0 }}" value="Add selected"/>
+				<ul id="siglum_list_{{ forloop.counter0 }}">
+	            {% for unit in units %}
+	              <li>{{ unit }}
+	              <input type="hidden" value="{{ unit }}" name="units_{{ forloop.parentloop.counter0 }}"/>
+	              <img alt="delete logo" class="delete_img delete_unit_{{ forloop.parentloop.counter0 }}" src="{% static '/collation/images/delete.png' %}"/>
+	              </li>
+	            {% endfor %}
+	          </ul>
+			</div>
+			{% if siglum in data_to_delete %}
+				<p>WARNING: This transcription is no longer in your list of project transcriptions</p>
+				<input class="btn delete-button" type="button" id="delete_siglum_{{ siglum }}" value="Delete data for {{ siglum }}"/>
+			{% endif %}
+        </div>
+      {% endfor %}
+    </form>
+  </main>
+{% endblock %}
+
+{% block footer %}
+	<div id="footer">
+		<a class="pure-button left_foot" href="/collation/projectsummary">Project Page</a>
+    <button class="pure-button right_foot" id="save-button">Save</button>
+  </div>
+{% endblock %}
