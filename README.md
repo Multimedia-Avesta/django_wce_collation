@@ -16,7 +16,9 @@ provides many additional functions including:
 
 This app is tested with Django 3.2.
 
-It requires the MUYA-WCE api, accounts and transcriptions apps to be installed. ADD LINKS
+It requires the MUYA-WCE api (https://github.com/Multimedia-Avesta/django_wce_api), accounts
+(https://github.com/Multimedia-Avesta/django_wce_accounts) and transcriptions
+https://github.com/Multimedia-Avesta/django_wce_transcriptions apps to be installed.
 
 A Java version of CollateX is included in the repository, other version can be access from the website
 (https://collatex.net/). It can be run locally for testing using the management command ```runcollatex```. In
