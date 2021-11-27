@@ -42,7 +42,8 @@ CELERY_RESULT_BACKEND = 'django-db'
 ```
 
 The following two directories must be configured in the Django settings to store the generated outputs before download.
-The directories can be anywhere on the system and do not need to match the example.
+The directories can be anywhere on the system and do not need to match the example. The directories must be created on 
+the server and have the appropriate permissions set so that the webserver user can write to the directories. 
 
 ```python
 APPARATUS_BASE_DIR = BASE_DIR / 'apparatus'
