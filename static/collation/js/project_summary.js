@@ -76,6 +76,7 @@ projectSummary = (function () {
       var data, apparatusUrl, callback;
       data = forms.serialiseForm('apparatus-output-form');
       apparatusUrl = '/collation/apparatus';
+      showProgressBox(JSON.stringify({}));
       callback = function (resp) {
         showProgressBox(resp);
         indexing.pollApparatusState();
