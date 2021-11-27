@@ -126,7 +126,7 @@ projectSummary = (function () {
   };
 
   showProgressBox = function(data) {
-    var error_div;
+    var message_div;
     data = JSON.parse(data);
     $('#check_ingested_data').off('click');
     $('#check_ingested_data').on('click', function() {
@@ -135,15 +135,23 @@ projectSummary = (function () {
     if (document.getElementById('error') !== null) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('error'));
     }
-    error_div = document.createElement('div');
-    error_div.setAttribute('id', 'error');
-    error_div.setAttribute('class', 'message');
-    error_div.innerHTML = '<span id="message_title"><b>Apparatus Progress</b></span>' +
-                          '<div id="error_close"></div><br/><br/>' +
-                          '<input type="hidden" id="task_id" value="' + data.task_id + '"/>' +
-                          '<p id="message">Checking the server for the task (' + data.task_id + ').</p>' +
-                          '<p id="indicator"></p>';
-    document.getElementsByTagName('body')[0].appendChild(error_div);
+    message_div = document.createElement('div');
+    message_div.setAttribute('id', 'error');
+    message_div.setAttribute('class', 'message');
+    if (data.hasOwnProperty('task_id')) {
+        message_div.innerHTML = '<span id="message_title"><b>Apparatus Progress</b></span>' +
+                              '<div id="error_close"></div><br/><br/>' +
+                              '<input type="hidden" id="task_id" value="' + data.task_id + '"/>' +
+                              '<p id="message">Checking the server for the task (' + data.task_id + ').</p>' +
+                              '<p id="indicator"></p>';
+    } else {
+        message_div.innerHTML = '<span id="message_title"><b>Apparatus Progress</b></span>' +
+                              '<div id="error_close"></div><br/><br/>' +
+                              '<input type="hidden" id="task_id" value=""/>' +
+                              '<p id="message">The task is being sent to the server.</p>' +
+                              '<p id="indicator"></p>';
+    }
+    document.getElementsByTagName('body')[0].appendChild(message_div);
   };
 
   _handleError = function(action, error_report, model) {

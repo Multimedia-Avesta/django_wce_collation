@@ -3,9 +3,9 @@ projectSummary = (function () {
     "use strict";
 
     var _saveProjectWitnesses, _setupPage, showProgressBox, _retrieveDownloadedFile,
-    _sortTranscriptionIdentifiers, _showWitnesses, _makeBasetextSelectionHTML,
-    _addHandlers,  _populateTranscriptionDropdowns, _readFile, _generateLatex, _resetForm,
-    _downloadTranscription, _extractRitualDirections, _extractNotes, _handleError, _showErrorBox;
+    _sortTranscriptionIdentifiers, _showWitnesses, _addHandlers,  _populateTranscriptionDropdowns,
+    _readFile, _generateLatex, _resetForm, _downloadTranscription, _extractRitualDirections,
+    _extractNotes, _handleError, _showErrorBox;
 
     var projectData;
 
@@ -61,8 +61,6 @@ projectSummary = (function () {
           data = forms.serialiseForm('get-latex-form');
           data.project_id = document.getElementById('project_id').value;
           _generateLatex(data);
-
-          // validateFile(options.validate_src, escape(f.name));
         });
       });
     });
@@ -77,6 +75,7 @@ projectSummary = (function () {
   _generateLatex = function(data) {
       var url, callback;
       url = '/collation/latex/';
+      showProgressBox(JSON.stringify({}));
       callback = function (resp) {
         showProgressBox(resp);
         indexing.pollApparatusState();
@@ -110,6 +109,7 @@ projectSummary = (function () {
   _extractRitualDirections = function (data) {
     var ritualDirectionsUrl, callback;
     ritualDirectionsUrl = '/collation/ritualdirections';
+    showProgressBox(JSON.stringify({}));
     callback = function (resp) {
       showProgressBox(resp);
       indexing.pollApparatusState();
@@ -124,6 +124,7 @@ projectSummary = (function () {
   _extractNotes = function (data) {
     var noteUrl, callback;
     noteUrl = '/collation/notes';
+    showProgressBox(JSON.stringify({}));
     callback = function (resp) {
       showProgressBox(resp);
       indexing.pollApparatusState();
@@ -183,22 +184,29 @@ projectSummary = (function () {
   };
 
   showProgressBox = function(data) {
-    var error_div;
+    var message_div;
     data = JSON.parse(data);
     if (document.getElementById('error') !== null) {
       document.getElementsByTagName('body')[0].removeChild(document.getElementById('error'));
     }
-    error_div = document.createElement('div');
-    error_div.setAttribute('id', 'error');
-    error_div.setAttribute('class', 'message');
-    error_div.innerHTML = '<span id="message_title"><b>Task Progress</b></span>' +
-                          '<div id="error_close"></div><br/><br/>' +
-                          '<input type="hidden" id="task_id" value="' + data.task_id + '"/>' +
-                          '<p id="message">Checking the server for the task (' + data.task_id + ').</p>' +
-                          '<p id="indicator"></p>';
-    document.getElementsByTagName('body')[0].appendChild(error_div);
+    message_div = document.createElement('div');
+    message_div.setAttribute('id', 'error');
+    message_div.setAttribute('class', 'message');
+    if (data.hasOwnProperty('task_id')) {
+        message_div.innerHTML = '<span id="message_title"><b>Task Progress</b></span>' +
+                              '<div id="error_close"></div><br/><br/>' +
+                              '<input type="hidden" id="task_id" value="' + data.task_id + '"/>' +
+                              '<p id="message">Checking the server for the task (' + data.task_id + ').</p>' +
+                              '<p id="indicator"></p>';
+    } else {
+        message_div.innerHTML = '<span id="message_title"><b>Task Progress</b></span>' +
+                              '<div id="error_close"></div><br/><br/>' +
+                              '<input type="hidden" id="task_id" value=""/>' +
+                              '<p id="message">The task is being sent to the server.</p>' +
+                              '<p id="indicator"></p>';
+    }
+    document.getElementsByTagName('body')[0].appendChild(message_div);
   };
-
 
   _sortTranscriptionIdentifiers = function (a, b) {
     var siglumA, siglumB;
@@ -320,38 +328,6 @@ projectSummary = (function () {
         document.body.removeChild(a);
       }
     });
-
-
-
-    // document.getElementById('download-transcription-button').download = filename;
-    // window.URL = window.URL || window.webkit.url;
-    // document.getElementById('download-transcription-button').href = window.URL.createObjectURL(blob);
-  };
-
-
-//This function is not really needed as the basetext is determined by basetext and userid
-//and we should never have two but since I wrote it I am keeping it here in case
-//anything ever goes wrong in the basetexts
-//NB: save will not work if the select is every activated!
-  _makeBasetextSelectionHTML = function (basetexts, currentProjectBasetext) {
-    var html;
-    html = [];
-    if (basetexts.length === 0) {
-      html.push('<li>Missing Basetext</li>');
-    } else if (basetexts.length === 1) {
-      html.push('<li class="not_draggable"><input type="hidden" value="' + basetexts[0] + '" name="witness"/>' + basetexts[0] + '</li>');
-    } else {
-      html.push('<li class="not_draggable"><select name="basetext">');
-      for (let i=0; i<basetexts.length; i+=1) {
-        if (basetexts[i] === currentProjectBasetext) {
-          html.push('<option value="' + basetexts[i] + '" selected="selected">' + basetexts[i] + '</option>');
-        } else {
-          html.push('<option value="' + basetexts[i] + '">' + basetexts[i] + '</option>');
-        }
-      }
-      html.push('</select></li>');
-    }
-    return html;
   };
 
   return {};
