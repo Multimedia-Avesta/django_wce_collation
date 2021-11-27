@@ -47,6 +47,8 @@ def get_apparatus(data, settings):
         os.makedirs(output_dir)
     except FileExistsError:
         pass
+    except PermissionError:
+        raise PermissionError('Cannot access the required directory, permissions are incorrect.')
     filename = '{0}-apparatus.{1}'.format(settings['format'], file_ext)
     with open(os.path.join(output_dir, filename), 'w', encoding="utf-8") as output:
         output.write(app)
@@ -63,6 +65,8 @@ def extract_notes(data, settings):
         os.makedirs(output_dir)
     except FileExistsError:
         pass
+    except PermissionError:
+        raise PermissionError('Cannot access the required directory, permissions are incorrect.')
     filename = 'notes.csv'
     with open(os.path.join(output_dir, filename), 'w', encoding='utf-8') as output:
         output.write('sigla\tcontaining unit\tnote text\n')
@@ -89,6 +93,8 @@ def extract_ritual_directions(data, settings):
         os.makedirs(output_dir)
     except FileExistsError:
         pass
+    except PermissionError:
+        raise PermissionError('Cannot access the required directory, permissions are incorrect.')
     filename = 'ritual_directions.csv'
     with open(os.path.join(output_dir, filename), 'w', encoding='utf-8') as output:
         output.write('sigla\t')
