@@ -84,7 +84,7 @@ projectSummary = (function () {
       $.post(apparatusUrl, data, function(response) {
         callback(response);
       }, "text").fail(function (response) {
-        handleError('apparatus', response);
+        _handleError('apparatus', response);
       });
     });
     $('#apparatus-select').on('change', function (e) {
@@ -156,30 +156,16 @@ projectSummary = (function () {
   };
 
   _handleError = function(action, error_report, model) {
-    // var report;
-    // report = 'An error has occurred.<br/>';
-    // if (error_report.status === 401) {
-    //   report += '<br/>You are not authorised to upload transcriptions into the database.<br/>' +
-    //             'Please contact the server administrator.';
-    // } else if (error_report.status === 403) {
-    //   if (error_report.responseText == 'work does not match project') {
-    //     report += '<br/>You need to select the correct project for the transcription you are uploading.<br/>' +
-    //               'Please select a different project and try again.';
-    //   } else if (error_report.responseText == 'project is not public') {
-    //     report += '<br/>You cannot upload a transcription with the public flag unless the project select is also public.<br/>' +
-    //               'Please select a different project or choose the private option and try again.';
-    //   } else {
-    //     report += '<br/>You are not authorised to upload transcriptions into the database.<br/>' +
-    //               'Please contact the server administrator.';
-    //   }
-    // } else if (error_report.status === 415) {
-    //   report += '<br/>It is has not been possible to process your request because ' +
-    //             error_report.responseText + '.';
-    // } else {
-    //   report += '<br/>The server has encountered an error. Please try again. <br/>' +
-    //             'If the problem persists please contact the server administrator.';
-    // }
-    // showErrorBox(report);
+    var report;
+    report = 'An error has occurred.<br/>';
+    if (error_report.status === 504) {
+        report += '<br/>The server has not responded to the request. Please try again.<br/>' +
+                  'If the problem persists please contact the server administrator.';
+    } else {
+      report += '<br/>The server has encountered an error. Please try again. <br/>' +
+                'If the problem persists please contact the server administrator.';
+    }
+    showErrorBox(report);
   };
 
   _addDeleteFunctions = function () {
