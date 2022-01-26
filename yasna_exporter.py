@@ -99,6 +99,12 @@ class YasnaExporter(object):
                 idno.addnext(char_elem)
         return
 
+    def get_witness_list(self, rdg):
+        witnesses = []
+        for wit in rdg.xpath('./tei:wit/tei:idno', namespaces=self.namespaces):
+            witnesses.append(wit.text)
+        return witnesses
+
     def add_witness_group_markers(self, xml):
 
         parser = etree.XMLParser(resolve_entities=False)
@@ -106,17 +112,15 @@ class YasnaExporter(object):
         tree = etree.ElementTree(tree.getroot())
 
         for rdg in tree.findall('.//tei:rdg', self.namespaces):
-            ids = rdg.get('wit')
-            if ids is not None:
-                id_list = ids.split(' ')
-                if len(id_list) > 1:
-                    witness_groups, witness_subgroups = self.get_witness_groups(id_list)
-                    for i, key in enumerate(witness_groups):
-                        if len(witness_groups) >= 2 and i <= len(witness_groups)-2:
-                            self.add_marker_after(rdg, witness_groups[key][-1], ';')
-                    for key in witness_subgroups:
-                        if len(witness_subgroups[key][0]) > 0 and len(witness_subgroups[key][1]) > 0:
-                            self.add_marker_after(rdg, witness_subgroups[key][0][-1], ',')
+            id_list = self.get_witness_list(rdg)
+            if len(id_list) > 1:
+                witness_groups, witness_subgroups = self.get_witness_groups(id_list)
+                for i, key in enumerate(witness_groups):
+                    if len(witness_groups) >= 2 and i <= len(witness_groups)-2:
+                        self.add_marker_after(rdg, witness_groups[key][-1], ';')
+                for key in witness_subgroups:
+                    if len(witness_subgroups[key][0]) > 0 and len(witness_subgroups[key][1]) > 0:
+                        self.add_marker_after(rdg, witness_subgroups[key][0][-1], ',')
         return etree.tostring(etree.ElementTree(tree.getroot()), encoding='utf-8', xml_declaration=True).decode()
 
     def get_witness_subgroups(self, witness_groups):
