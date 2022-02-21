@@ -1260,6 +1260,7 @@ def extract_notes(request):
     settings['path'] = path
     settings['project'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
+    settings['name'] = request.user.full_name
     task = tasks.extract_notes.delay(data, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
 

@@ -4,6 +4,7 @@ import base64
 from celery import shared_task
 from django.core.mail import EmailMessage
 from django.conf import settings as django_settings
+from django.template.loader import get_template
 from .core.exporter_factory import ExporterFactory
 from collation.ritual_direction_extractor import RitualDirectionExtractor
 from collation.note_extractor import NoteExtractor
@@ -85,7 +86,8 @@ def extract_notes(data, settings):
         for siglum in sigla:
             for entry in notes[siglum]:
                 output.write('{}\t{}\t{}\n'.format(siglum, entry[0], entry[1]))
-    message = 'Please find attached the results of the recent task you requested on the MUYA WCE.'
+    template = get_template('collation/export_email_template.html')
+    message = template.render({'name': settings['name']})
     msg = EmailMessage('MUYA-WCE note extraction results',
                        message,
                        'itsee@contacts.bham.ac.uk',
