@@ -416,41 +416,6 @@ def get_apparatus(request):
             print(data)
         return JsonResponse(data)
 
-    # elif 'file' in request.GET:
-    #     """
-    #     If we have a GET request and 'file' in the request then download the file
-    #     """
-    #     post_login_url = request.path + '?' + request.GET.urlencode()
-    #     login_details = get_login_status(request)
-    #     task_id = request.GET.get('file')
-    #     task = AsyncResult(task_id)
-    #     data = data = {'page_title': 'Apparatus Generator',
-    #                    'login_status': login_details,
-    #                    'post_logout_url': '/collation',
-    #                    'post_login_url': post_login_url,
-    #                    'back_url': '/collation/projectsummary',
-    #                    'back_text': 'Return to Project Summary'}
-    #     if task.result:
-    #         url = task.result[1]
-    #         path = task.result[2]
-    #         format = task.result[3]
-    #         project = task.result[4]
-    #         # reconstruct the path here to make sure we are who we were when we created it!
-    #         filepath = os.path.join(django_settings.APPARATUS_BASE_DIR, project, str(request.user.id), format, path)
-    #         if ('/' not in task.result) and os.path.isfile(filepath):
-    #             if 'xml' in format:
-    #                 response = HttpResponse(content_type='text/xml')
-    #             else:
-    #                 response = HttpResponse(content_type='text/plain')
-    #             response['Content-Disposition'] = 'attachment; filename=' + path
-    #             response.write(open(filepath, 'rb').read())
-    #             return response
-    #         else:
-    #             data['message'] = 'There was a problem with locating the file download.'
-    #     else:
-    #         data['message'] = 'The task id was not recognised.'
-    #     return render(request, 'collation/download_problem.html', data)
-
     # this is the one from each unit
     if 'data' in request.POST:
         data = json.loads(request.POST.get('data'))
@@ -535,6 +500,7 @@ def get_apparatus(request):
     settings['project_id'] = request.POST.get('project__id')
     settings['settings']['main_language'] = project.language
     settings['email_addresses'] = [request.user.email]
+    settings['name'] = request.user.full_name
     if project.language == 'sa':
         settings['settings']['book_prefix'] = 'S'
     task = tasks.get_apparatus.delay(data, settings)
@@ -1213,38 +1179,6 @@ def extract_notes(request):
                 }
         return JsonResponse(data)
 
-    # elif 'file' in request.GET:
-    #     """
-    #     If we have a GET request and 'file' in the request then we return the file to the user
-    #     """
-    #     post_login_url = request.path + '?' + request.GET.urlencode()
-    #     login_details = get_login_status(request)
-    #     task_id = request.GET.get('file')
-    #     task = AsyncResult(task_id)
-    #     data = data = {'page_title': 'Apparatus Generator',
-    #                    'login_status': login_details,
-    #                    'post_logout_url': '/collation',
-    #                    'post_login_url': post_login_url,
-    #                    'back_url': '/collation/transcriptionmanagement',
-    #                    'back_text': 'Return to Transcription Management'}
-    #     if task.result:
-    #         path = task.result[2]
-    #         project = task.result[3]
-    #         # reconstruct the path here to make sure we are who we were when we created it!
-    #         filepath = os.path.join(django_settings.EXPORT_BASE_DIR, project,
-    #                                 str(request.user.id), 'notes', path)
-    #         if ('/' not in task.result) and os.path.isfile(filepath):
-    #             response = HttpResponse(content_type='text/plain')
-    #             response['Content-Disposition'] = 'attachment; filename=' + path
-    #             response.write(open(filepath, 'rb').read())
-    #
-    #             return response
-    #         else:
-    #             data['message'] = 'There was a problem with locating the file download.'
-    #     else:
-    #         data['message'] = 'The task id was not recognised.'
-    #     return render(request, 'collation/download_problem.html', data)
-
     query = Q()
     transcription_id = request.POST.get('transcription-for-note-extraction')
     if transcription_id == 'All project transcriptions':
@@ -1284,38 +1218,6 @@ def extract_ritual_directions(request):
                 }
         return JsonResponse(data)
 
-    # elif 'file' in request.GET:
-    #     """
-    #     If we have a GET request and 'file' in the request then we return the file to the user
-    #     """
-    #     post_login_url = request.path + '?' + request.GET.urlencode()
-    #     login_details = get_login_status(request)
-    #     task_id = request.GET.get('file')
-    #     task = AsyncResult(task_id)
-    #     data = data = {'page_title': 'Ritual Directions Extractor',
-    #                    'login_status': login_details,
-    #                    'post_logout_url': '/collation',
-    #                    'post_login_url': post_login_url,
-    #                    'back_url': '/collation/transcriptionmanagement',
-    #                    'back_text': 'Return to Transcription Management'}
-    #     if task.result:
-    #         path = task.result[2]
-    #         project = task.result[3]
-    #         # reconstruct the path here to make sure we are who we were when we created it!
-    #         filepath = os.path.join(django_settings.EXPORT_BASE_DIR, project,
-    #                                 str(request.user.id), 'ritual_directions', path)
-    #         if ('/' not in task.result) and os.path.isfile(filepath):
-    #             response = HttpResponse(content_type='text/plain')
-    #             response['Content-Disposition'] = 'attachment; filename=' + path
-    #             response.write(open(filepath, 'rb').read())
-    #
-    #             return response
-    #         else:
-    #             data['message'] = 'There was a problem with locating the file download.'
-    #     else:
-    #         data['message'] = 'The task id was not recognised.'
-    #     return render(request, 'collation/download_problem.html', data)
-
     query = Q()
     transcription_id = request.POST.get('transcription-for-rd-extraction')
     if transcription_id == 'All project transcriptions':
@@ -1331,6 +1233,7 @@ def extract_ritual_directions(request):
     settings['path'] = path
     settings['project'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
+    settings['name'] = request.user.full_name
     task = tasks.extract_ritual_directions.delay(data, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
 
@@ -1354,43 +1257,12 @@ def get_latex(request):
                 }
         return JsonResponse(data)
 
-    # elif 'file' in request.GET:
-    #     """
-    #     If we have a GET request and 'file' in the request then we return the file to the user
-    #     """
-    #     post_login_url = request.path + '?' + request.GET.urlencode()
-    #     login_details = get_login_status(request)
-    #     task_id = request.GET.get('file')
-    #     task = AsyncResult(task_id)
-    #     data = {'page_title': 'Latex Transcription Generator',
-    #             'login_status': login_details,
-    #             'post_logout_url': '/collation',
-    #             'post_login_url': post_login_url,
-    #             'back_url': '/collation/transcriptionmanagement',
-    #             'back_text': 'Return to Transcription Management'}
-    #     if task.result:
-    #         path = task.result[2]
-    #         project = task.result[3]
-    #         # reconstruct the path here to make sure we are who we were when we created it!
-    #         filepath = os.path.join(django_settings.EXPORT_BASE_DIR, project,
-    #                                 str(request.user.id), 'latex-transcription', path)
-    #         if ('/' not in task.result) and os.path.isfile(filepath):
-    #             response = HttpResponse(content_type='text/plain')
-    #             response['Content-Disposition'] = 'attachment; filename=' + path
-    #             response.write(open(filepath, 'rb').read())
-    #
-    #             return response
-    #         else:
-    #             data['message'] = 'There was a problem with locating the file download.'
-    #     else:
-    #         data['message'] = 'The task id was not recognised.'
-    #     return render(request, 'collation/download_problem.html', data)
-
     settings = {}
     transcription_src = request.POST.get('latex_src', None)
     path = os.path.join(request.POST.get('project_id'), str(request.user.id), 'latex-transcription')
     settings['path'] = path
     settings['project_id'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
+    settings['name'] = request.user.full_name
     task = tasks.generate_transcription_latex.delay(transcription_src, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
