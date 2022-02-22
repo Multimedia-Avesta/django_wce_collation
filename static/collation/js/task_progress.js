@@ -23,20 +23,25 @@ indexing = (function () {
                   stop = true;
                   if (result.state === 'SUCCESS') {
                       if (Array.isArray(result.result)) {
-                        if (result.result[0] === 'download') {
-                          document.getElementById('message').innerHTML = 'Your task is complete: <a href="' +
-                                                                         result.result[1] + '?file=' +
-                                                                         task_id + '">Download</a>';
-                          if (document.getElementById('indicator')) {
-                            document.getElementById('indicator').innerHTML = '';
+                          if (result.result[0] === 'download') {
+                              document.getElementById('message').innerHTML = 'Your task is complete: <a href="' +
+                                                                             result.result[1] + '?file=' +
+                                                                             task_id + '">Download</a>';
+                              if (document.getElementById('indicator')) {
+                                document.getElementById('indicator').innerHTML = '';
+                              }
+                          } else if (result.result[0] === 'email') {
+                              document.getElementById('message').innerHTML = 'Your task is complete and an email has been sent to your registered email address.';
+                              if (document.getElementById('indicator')) {
+                                document.getElementById('indicator').innerHTML = '';
+                              }
+                          } else {
+                              document.getElementById('message').innerHTML = 'Your task is complete.';
+                              document.getElementById('indicator').innerHTML = '';
                           }
-                        } else {
-                          document.getElementById('message').innerHTML = 'Your task is complete.';
-                          document.getElementById('indicator').innerHTML = '';
-                        }
                       } else {
-                        document.getElementById('message').innerHTML = 'Your task is complete.';
-                        document.getElementById('indicator').innerHTML = '';
+                            document.getElementById('message').innerHTML = 'Your task is complete.';
+                            document.getElementById('indicator').innerHTML = '';
                       }
                   } else {
                       document.getElementById('message').innerHTML = 'Your task failed with the message:<br/><br/>' +

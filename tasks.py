@@ -2,15 +2,31 @@ import os
 import re
 import base64
 from celery import shared_task
+from django.core.mail import EmailMessage
 from django.conf import settings as django_settings
+from django.template.loader import get_template
 from .core.exporter_factory import ExporterFactory
 from collation.ritual_direction_extractor import RitualDirectionExtractor
 from collation.note_extractor import NoteExtractor
 from collation.transcription_to_latex import TranscriptionConverter
 
 
+def send_email(output_dir, filename, addresses, name):
+    template = get_template('collation/export_email_template.html')
+    message = template.render({'name': name})
+    msg = EmailMessage('MUYA-WCE note extraction results', message, django_settings.DEFAULT_FROM_EMAIL, addresses)
+    msg.content_subtype = 'html'
+    msg.attach_file(os.path.join(output_dir, filename))
+    msg.send()
+
+
 @shared_task(track_started=True)
 def get_apparatus(data, settings):
+
+    recipient_email_addresses = settings['email_addresses']
+    del settings['email_addresses']
+    recipient_name = settings['name']
+    del settings['name']
 
     exporter_settings = None
     if 'format' in settings:
@@ -52,7 +68,8 @@ def get_apparatus(data, settings):
     filename = '{0}-apparatus.{1}'.format(settings['format'], file_ext)
     with open(os.path.join(output_dir, filename), 'w', encoding="utf-8") as output:
         output.write(app)
-    return ('download', 'apparatus', filename, settings['format'], settings['project_id'])
+    send_email(output_dir, filename, recipient_email_addresses, recipient_name)
+    return ('email', 'apparatus', filename, settings['format'], settings['project_id'])
 
 
 @shared_task(track_started=True)
@@ -73,7 +90,8 @@ def extract_notes(data, settings):
         for siglum in sigla:
             for entry in notes[siglum]:
                 output.write('{}\t{}\t{}\n'.format(siglum, entry[0], entry[1]))
-    return ('download', 'notes', filename, settings['project'])
+    send_email(output_dir, filename, settings['email_addresses'], settings['name'])
+    return ('email', 'notes', filename, settings['project'])
 
 
 @shared_task(track_started=True)
@@ -112,7 +130,8 @@ def extract_ritual_directions(data, settings):
                 else:
                     output.write('\t'*n_list_counts[n])
             output.write('\n')
-    return ('download', 'ritualdirections', filename, settings['project'], errors)
+    send_email(output_dir, filename, settings['email_addresses'], settings['name'])
+    return ('email', 'ritual-directions', filename, settings['project'], errors)
 
 
 @shared_task(track_started=True)
@@ -134,4 +153,5 @@ def generate_transcription_latex(transcription_src, settings):
     filename = 'latex-transcription-{}.txt'.format(siglum)
     with open(os.path.join(output_dir, filename), 'w', encoding="utf-8") as output:
         output.write(latex)
-    return ('download', 'latex-transcription', filename, str(settings['project_id']))
+    send_email(output_dir, filename, settings['email_addresses'], settings['name'])
+    return ('email', 'latex-transcription', filename, str(settings['project_id']))
