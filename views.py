@@ -500,7 +500,7 @@ def get_apparatus(request):
     settings['project_id'] = request.POST.get('project__id')
     settings['settings']['main_language'] = project.language
     settings['email_addresses'] = [request.user.email]
-    settings['name'] = request.user.full_name
+    settings['name'] = request.user.first_name
     if project.language == 'sa':
         settings['settings']['book_prefix'] = 'S'
     task = tasks.get_apparatus.delay(data, settings)
@@ -1194,7 +1194,7 @@ def extract_notes(request):
     settings['path'] = path
     settings['project'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
-    settings['name'] = request.user.full_name
+    settings['name'] = request.user.first_name
     task = tasks.extract_notes.delay(data, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
 
@@ -1233,7 +1233,7 @@ def extract_ritual_directions(request):
     settings['path'] = path
     settings['project'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
-    settings['name'] = request.user.full_name
+    settings['name'] = request.user.first_name
     task = tasks.extract_ritual_directions.delay(data, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
 
@@ -1263,6 +1263,6 @@ def get_latex(request):
     settings['path'] = path
     settings['project_id'] = request.POST.get('project_id')
     settings['email_addresses'] = [request.user.email]
-    settings['name'] = request.user.full_name
+    settings['name'] = request.user.first_name
     task = tasks.generate_transcription_latex.delay(transcription_src, settings)
     return HttpResponseRedirect('?task=' + task.task_id + '&project=' + request.POST.get('project_id'))
