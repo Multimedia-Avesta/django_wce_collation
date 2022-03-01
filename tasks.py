@@ -14,7 +14,8 @@ from collation.transcription_to_latex import TranscriptionConverter
 def send_email(output_dir, filename, addresses, name):
     template = get_template('collation/export_email_template.html')
     message = template.render({'name': name})
-    msg = EmailMessage('MUYA-WCE note extraction results', message, django_settings.DEFAULT_FROM_EMAIL, addresses)
+    msg = EmailMessage('MUYA-WCE note extraction results', message, django_settings.DEFAULT_FROM_EMAIL, addresses,
+                       reply_to=tuple(django_settings.CONTACT_EMAIL))
     msg.content_subtype = 'html'
     msg.attach_file(os.path.join(output_dir, filename))
     msg.send()
