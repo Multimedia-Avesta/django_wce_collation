@@ -257,7 +257,7 @@ projectSummary = (function () {
           details[units.results[i].context] = [null, null, null, null, null];
         }
       }
-      unitCriteria = {'project__id': projectData.id, 'user__id': projectData.managing_editor, 'limit': 100000000000, '_fields': 'status,context,created_time,last_modified_time'};
+      unitCriteria = {'project__id': projectData.id, 'status': 'regularised,set,ordered', 'user__id': projectData.managing_editor, 'limit': 100000000000, '_fields': 'status,context,created_time,last_modified_time'};
       if (chapter !== undefined) {
         unitCriteria.chapter_number = chapter;
       }
