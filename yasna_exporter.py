@@ -255,9 +255,11 @@ class YasnaExporter(object):
 
         header_string = '''<teiHeader><fileDesc><titleStmt><title type="document">An apparatus of the Yasna</title>
                         </titleStmt>
-                        <publicationStmt><distributor><name type="org">Corpus Avesticum: Digital Yasna (CoAv)</name>
+                        <publicationStmt><distributor>
+                        <name type="org">Corpus Avesticum (CoAv): The Multimedia Yasna (MUYA)</name>
                         <name type="org">School of Oriental and African Studies (SOAS)</name>
-                        <name type="org">University of London (UoL)</name></distributor>
+                        <name type="org">University of London (UoL)</name>
+                        </distributor>
                         <availability><p>Attribution 4.0 International (CC BY 4.0) Available for re-use under a
                         creative commons license provided attribution is made to the original creators</p>
                         </availability></publicationStmt><sourceDesc>
@@ -970,8 +972,12 @@ class YasnaExporter(object):
                 new_hand_list.append(hand)
         return new_hand_list
 
-    def fix_reading_hands(self, reading, siglum, ordered_expected_hands, context):
+    def fix_reading_hands(self, reading, siglum, ordered_expected_hands, context='unknown'):
         hands_for_deletion = []
+        if 'suffixes' not in reading:
+            raise DataStructureError('There is a problem with the structure of a unit (context is {}). First try '
+                                     'reapproving the unit. If the problem persists please recollate the unit from '
+                                     'the collation home page.'.format(context))
         if (self.all_hands_present(ordered_expected_hands, reading['witnesses'])
                 and self.all_share_suffix(ordered_expected_hands, reading['witnesses'], reading['suffixes'])):
             # then we need to remove all the hands and replace with the siglum + suffix
