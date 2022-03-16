@@ -740,6 +740,9 @@ django_services = (function() {
         if (successCallback) {
             successCallback();
         }
+    }).fail(function (response) {
+        alert('This unit cannot be exported. First try reapproving the unit. If the problem persists please ' +
+              'recollate the unit from the collation home page.');
     });
   };
 
