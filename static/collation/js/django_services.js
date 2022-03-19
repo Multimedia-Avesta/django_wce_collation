@@ -19,7 +19,7 @@ django_services = (function() {
   const contextInput = { //this is only a partial implementation as form itself is handled by Django
        'form' : null,
        'result_provider' : function () {
-           var book, chapter, verse, ref, basetext;
+           var book, chapter, stanza, line, ref;
            book = document.getElementById('book').value;
            chapter = document.getElementById('chapter').value;
            stanza = document.getElementById('stanza').value;
@@ -51,7 +51,6 @@ django_services = (function() {
 
    const lac_unit_label = 'lac unit';
    const om_unit_label = 'om unit';
-
 
    const preStageChecks = {
 	    "order_readings": [
@@ -393,18 +392,18 @@ django_services = (function() {
         var transcription_list;
         transcription_list = response.results;
         var siglum_map = {};
-          for (var i = 0; i < transcription_list.length; i += 1) {
+          for (let i = 0; i < transcription_list.length; i += 1) {
             if (id_list.indexOf(transcription_list[i].identifier) !== -1) { //extra test for bug which returns too much data if a single empty string in id list
               //TODO: consider this. Using identifier is better for understanding but you will need to remember to do all lookupd using this and that means they all have to be done in services
       		    siglum_map[transcription_list[i].siglum] = transcription_list[i].identifier;
             }
-      		}
-      		result_callback(siglum_map);
+      	  }
+      	  result_callback(siglum_map);
       });
     } else {
       result_callback({});
     }
-	};
+  };
 
   //TODO: merge this with context input?
   getWitnessesFromInputForm = function() {
@@ -709,50 +708,63 @@ django_services = (function() {
   };
 
   getApparatusForContext = function (successCallback)  {
-    var url, format;
+    var url, format, callback;
     format = 'latex';
     url = '/collation/apparatus';
-    $.post(url, {
-      csrfmiddlewaretoken: api.getCSRFToken(),
-      settings: CL.getExporterSettings(),
-      format: format,
-      data: JSON.stringify([{
-        "context": CL.context,
-        "structure": CL.data
-        }])
-    }).then(function (response) {
-        var blob, filename, downloadUrl, hiddenLink;
-        if (format === 'latex') {
-            blob = new Blob([response], {'type': 'text/txt'});
-            filename = CL.context + '_' + format + '_apparatus.txt';
-        } else {
-            blob = new Blob([response], {'type': 'text/xml'});
-            filename = CL.context + '_' + format + '_apparatus.xml';
+    callback = function(collations) {
+        var collationId, innerCallback;
+        for (let i=0; i<collations.length; i+=1) {
+            if (collations[i].status === 'approved') {
+                collationId = collations[i].id;
+            }
         }
-        downloadUrl = window.URL.createObjectURL(blob);
-        hiddenLink = document.createElement('a');
-        hiddenLink.style.display = 'none';
-        hiddenLink.href = downloadUrl;
-        hiddenLink.download = filename;
-        document.body.appendChild(hiddenLink);
-        hiddenLink.click();
-        window.URL.revokeObjectURL(downloadUrl);
-        if (successCallback) {
-            successCallback();
-        }
-    }).fail(function (response) {
-        alert('This unit cannot be exported. First try reapproving the unit. If the problem persists please ' +
-              'recollate the unit from the collation home page.');
-    });
+        innerCallback = function (collation) {
+            $.post(url, {
+              csrfmiddlewaretoken: api.getCSRFToken(),
+              settings: CL.getExporterSettings(),
+              format: format,
+              data: JSON.stringify([{
+                "context": CL.context,
+                "structure": collation.structure
+                }])
+            }).then(function (response) {
+                var blob, filename, downloadUrl, hiddenLink;
+                if (format === 'latex') {
+                    blob = new Blob([response], {'type': 'text/txt'});
+                    filename = CL.context + '_' + format + '_apparatus.txt';
+                } else {
+                    blob = new Blob([response], {'type': 'text/xml'});
+                    filename = CL.context + '_' + format + '_apparatus.xml';
+                }
+                downloadUrl = window.URL.createObjectURL(blob);
+                hiddenLink = document.createElement('a');
+                hiddenLink.style.display = 'none';
+                hiddenLink.href = downloadUrl;
+                hiddenLink.download = filename;
+                document.body.appendChild(hiddenLink);
+                hiddenLink.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                if (successCallback) {
+                    successCallback();
+                }
+            }).fail(function (response) {
+                alert('This unit cannot be exported. First try reapproving the unit. If the problem persists please ' +
+                      'recollate the unit from the collation home page.');
+            });
+        };
+        loadSavedCollation(collationId, innerCallback);
+    };
+    getSavedCollations(CL.context, undefined, callback);
+
   };
 
 
   //TODO: think about adding an optional stage argument here so we can get very specific things back.
-  //would make the checks needed for adding an removing a little bit quicker
-  getSavedCollations = function(verse, user_id, result_callback) {
+  //would make the checks needed for adding and removing a little bit quicker
+  getSavedCollations = function(context, user_id, result_callback) {
     var criteria;
     criteria = {};
-    criteria.context = verse;
+    criteria.context = context;
     CL.services.getUserInfo(function(current_user) {
       if (current_user) {
         if (CL.project.hasOwnProperty('id')) {
