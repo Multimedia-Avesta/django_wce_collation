@@ -3,6 +3,12 @@ django_services = (function() {
   //TODO: transcription_id in verse data needs to be deprecated in favour of transcription
   //because that is how it is stored in our data now
 
+    const localCollationFunction = {
+        'python_file': 'collation.local_collation',
+        'class_name': 'LocalCollation',
+        'function': 'do_collate'
+    };
+
   const undoStackLength = 12;
 
   const allowWitnessChangesInSavedCollations = false;
@@ -912,6 +918,7 @@ django_services = (function() {
     addExtraFooterFunctions: addExtraFooterFunctions,
     extractWordsForHeader: extractWordsForHeader,
     exporterSettings: exporterSettings,
+      localCollationFunction, localCollationFunction,
 
   };
 
