@@ -550,6 +550,10 @@ class YasnaExporter(object):
             return readings
         lemma_reading = readings.pop(match)
         readings.insert(0, lemma_reading)
+        # now fix the labels again!
+        for i, reading in enumerate(readings):
+            if 'type' not in reading or reading['type'] == 'om':
+                reading['label'] = self.alphabet_list[i]
         return readings
 
     def get_lemma_text(self, overtext, start, end):
